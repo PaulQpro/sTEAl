@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+mcs -target:library StealLang.cs -r:System.Core &&
+mcs Steal.cs -r:StealLang &&
+echo "===========" && echo "Executing Steal.exe:" && echo "===========" &&
+./Steal.exe
