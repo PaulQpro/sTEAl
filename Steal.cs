@@ -4,7 +4,7 @@ namespace Default{
 	public class Program{
 		public static void Main(){
 			Console.WriteLine("HelloWorld!");
-			new StealLang().Run();
+			new StealLang("Var str Type String Value \"Hello World!\"").Run();
 		}
 	}
 }
