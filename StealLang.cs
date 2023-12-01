@@ -81,6 +81,7 @@ namespace Steal{
 								Console.WriteLine(
 									$"\n{program[i].Value.ToString()} is not valid varible name"
 								);
+								return;
 							}
 							break;
 					}
@@ -134,6 +135,7 @@ namespace Steal{
 					switch (sym){	
 						case '\n':
 							line++;
+							result.Add(str); str="";
 							break;
 						case '\\':
 							escapeChar = true;
@@ -216,7 +218,7 @@ namespace Steal{
 		private bool ValidateVarName(string name){
 			if(int.TryParse(name[0].ToString(),out int _)) return false;
 			foreach(char letter in name){
-				if(!char.IsAsciiLetter(letter)) return false;
+				if(!char.IsLower(letter)&&!char.IsUpper(letter)) return false;
 			}
 			return true;
 		}
