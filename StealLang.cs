@@ -112,6 +112,7 @@ namespace Steal{
 					case "Type": goto case "Value";
 					case "Value":
 						result.Add(new Token(TokenType.Keyword, src_p[i]));
+						break;
 					default:
 						if(long.TryParse(src_p[i], out long val_long)) result.Add(new Token(TokenType.Integer, val_long));
 						else if (double.TryParse(src_p[i], out double val_double)) result.Add(new Token(TokenType.Decimal, val_double));
