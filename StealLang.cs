@@ -9,8 +9,87 @@ namespace Steal{
 		string src;
 		bool err;
 		string errMsg;
+		Dictionary<string,object> varibles;
 		public void Run(){
-			Console.WriteLine(JsonSerializer.Serialize(Tokenize(Parse())));	
+			varibles = new Dictionary<string,object>();
+			varibles.Add("Result",0);
+			Token[] program = Tokenize(Parse());
+			if(err){
+				Console.WriteLine($"Following error ocurred during parsing: {errMsg}");
+				return;
+			}
+			for(int i = 0; i < program.Length; i++){
+				Token token = program[i];
+				if(token.Type == TokenType.Command){
+					switch((Command)Enum.Parse(typeof(Command),token.Value.ToString())){
+						case Command.Print:
+							Console.Write(program[++i].Value.ToString());
+							break;
+						case Command.Line:
+							Console.WriteLine(program[++i].Value.ToString());
+							break;
+						case Command.Var:
+							string name;
+							object type;
+							object value;
+							if(ValidateVarName(program[++i].Value.ToString())){
+								name = program[i].Value.ToString();
+								if(program[++i].Type == TokenType.Keyword && program[i].Value.ToString() == "Type"){
+									if(!Enum.TryParse(typeof(VarType),program[++i].Value.ToString(),out type)){
+										Console.WriteLine(
+											$"\nUnexpexted token \"{program[i].Value.ToString()}\" "+
+											$"of type{program[i].Type}, expected token of type VaribleType"
+										);
+										return;
+									}
+									if(program[++i].Type == TokenType.Keyword && program[i].Value.ToString() == "Value"){
+										switch((VarType)type){
+											case VarType.Integer:
+												if(program[++i].Type == TokenType.Integer){
+													value = program[i].Value;
+												} else {
+													Console.WriteLine(
+														$"\nUnexpected token {program[i].Value.ToString()} of type {program[i].Type}"+
+														$", expected token of type Integer"
+													);
+													return;
+												}
+												break;
+											case VarType.Decimal:
+												if(program[++i].Type == TokenType.Decimal || program[i].Type == TokenType.Integer){
+													value = program[i].Value;
+												} else {
+													Console.WriteLine(
+														$"\nUnexpected token {program[i].Value.ToString()} of type {program[i].Type}"+
+                                                                                                        	$", expected token of type Decimal or Integer"
+                                                                                                        );
+                                                                                                        return;
+                                                                                                }
+												break;
+											case VarType.String:
+												value = program[++i].Value.ToString();
+												break;
+										}
+									}
+								} else {
+									Console.WriteLine(
+										$"\nUnexpected token {program[i].Value.ToString()} of type {program[i].Type}"+
+										$",expected token Type of type KeyWord"
+									);
+								}
+							} else {
+								Console.WriteLine(
+									$"\n{program[i].Value.ToString()} is not valid varible name"
+								);
+							}
+							break;
+					}
+				}
+				else{
+					Console.WriteLine($"\nUnexpected token {token.Value.ToString()} of type {token.Type}, expected token of type Command");
+					return;
+				}
+			}
 		}
 		private enum TokenType{
 			Command,
@@ -29,8 +108,12 @@ namespace Steal{
 		private enum Command{
 			Print,
                         Line,
-			Type,
+			Var,
                 }
+		private enum Keyword{
+			Type,
+			Value,
+		}
 		private class Token{
 			public TokenType Type {get;set;}
 			public object Value {get;set;}
@@ -89,8 +172,14 @@ namespace Steal{
 							errMsg = $"Unexpected escape sequence \\{sym} at line {line}";
 							break;
 					}
+					if(err) return null;
 					escapeChar = false;
 				}
+			}
+			if(insideQuotes){
+				err = true;
+				errMsg = $"Unexpected \"End Of File\", expected \"";
+				return null;
 			}
 			result.Add(str);
 			return result.ToArray();
@@ -99,6 +188,8 @@ namespace Steal{
 			List<Token> result = new List<Token>();
 			for(int i = 0; i < src_p.Length; i++){
 				switch(src_p[i]){
+					case "":
+						break;
 					case "Var": goto case "Print";
 					case "Print": goto case "Line";
 					case "Line":
@@ -107,7 +198,7 @@ namespace Steal{
 					case "String": goto case "Integer";
 				 	case "Integer": goto case "Decimal";
 					case "Decimal":
-						result.Add(new Token(TokenType.VarType, (VarType) Enum.Parse(typeof(VarType), src_p[i], true)));
+						result.Add(new Token(TokenType.VarType, src_p[i]));
 						break;
 					case "Type": goto case "Value";
 					case "Value":
@@ -121,6 +212,13 @@ namespace Steal{
 				}
 			}
 			return result.ToArray();
+		}
+		private bool ValidateVarName(string name){
+			if(int.TryParse(name[0].ToString(),out int _)) return false;
+			foreach(char letter in name){
+				if(!char.IsAsciiLetter(letter)) return false;
+			}
+			return true;
 		}
 		public StealLang(string src){
 			this.src = src;
