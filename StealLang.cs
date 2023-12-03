@@ -240,7 +240,7 @@ namespace Steal{
 			return true;
 		}
 		private string InsertVarible(Token token){
-			string[] words = token.Value.ToString().Split(' ');
+			List<string> words = new List<string>(token.Value.ToString().Split(' '));
 			for(int i = 0; i < words.Length; i++){
 				string word = words[i];
 				if(word[0] == '\r'){
