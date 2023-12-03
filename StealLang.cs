@@ -247,8 +247,8 @@ namespace Steal{
 					string name = word.Substring(1);
 					if(ValidateVarName(name)){
 						if(varibles.ContainsKey(name)){
-							name = name.Remove(i);
-							name = name.Insert(i, varibles[name].ToString());
+							words = words.Remove(i);
+							words = words.Insert(i, varibles[name].ToString());
 						} else {
 							errMsg = $"Varible \"{name}\" doesn't exist";
 							throw new ArgumentException(errMsg);
