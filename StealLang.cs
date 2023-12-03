@@ -11,6 +11,7 @@ namespace Steal{
 		string errMsg;
 		Dictionary<string,object> varibles;
 		public void Run(){
+			try{
 			varibles = new Dictionary<string,object>();
 			varibles.Add("Result",0);
 			Token[] program = Tokenize(Parse());
@@ -21,35 +22,35 @@ namespace Steal{
 			for(int i = 0; i < program.Length; i++){
 				Token token = program[i];
 				if(token.Type == TokenType.Command){
-					switch((Command)Enum.Parse(typeof(Command),token.Value.ToString())){
+					switch((Command)Enum.Parse(typeof(Command),InsertVarible(token))){
 						case Command.Print:
-							Console.Write(program[++i].Value.ToString());
+							Console.Write(InsertVarible(program[++i]));
 							break;
 						case Command.Line:
-							Console.WriteLine(program[++i].Value.ToString());
+							Console.WriteLine(InsertVarible(program[++i]));
 							break;
 						case Command.Var:
-							string name;
-							object type;
-							object value;
-							if(ValidateVarName(program[++i].Value.ToString())){
-								name = program[i].Value.ToString();
-								if(program[++i].Type == TokenType.Keyword && program[i].Value.ToString() == "Type"){
-									if(!Enum.TryParse(typeof(VarType),program[++i].Value.ToString(),out type)){
+							string name = "";
+							object type = null;
+							object value = null;
+							if(ValidateVarName(InsertVarible(program[++i]))){
+								name = InsertVarible(program[i]);
+								if(program[++i].Type == TokenType.Keyword && InsertVarible(program[i]) == "Type"){
+									if(!Enum.TryParse(typeof(VarType),InsertVarible(program[++i]),out type)){
 										Console.WriteLine(
-											$"\nUnexpexted token \"{program[i].Value.ToString()}\" "+
+											$"\nUnexpexted token \"{InsertVarible(program[i])}\" "+
 											$"of type{program[i].Type}, expected token of type VaribleType"
 										);
 										return;
 									}
-									if(program[++i].Type == TokenType.Keyword && program[i].Value.ToString() == "Value"){
+									if(program[++i].Type == TokenType.Keyword && InsertVarible(program[i]) == "Value"){
 										switch((VarType)type){
 											case VarType.Integer:
 												if(program[++i].Type == TokenType.Integer){
 													value = program[i].Value;
 												} else {
 													Console.WriteLine(
-														$"\nUnexpected token {program[i].Value.ToString()} of type {program[i].Type}"+
+														$"\nUnexpected token {InsertVarible(program[i])} of type {program[i].Type}"+
 														$", expected token of type Integer"
 													);
 													return;
@@ -60,36 +61,48 @@ namespace Steal{
 													value = program[i].Value;
 												} else {
 													Console.WriteLine(
-														$"\nUnexpected token {program[i].Value.ToString()} of type {program[i].Type}"+
+														$"\nUnexpected token {InsertVarible(program[i])} of type {program[i].Type}"+
                                                                                                         	$", expected token of type Decimal or Integer"
                                                                                                         );
                                                                                                         return;
                                                                                                 }
 												break;
 											case VarType.String:
-												value = program[++i].Value.ToString();
+												value = InsertVarible(program[++i]);
 												break;
 										}
 									}
 								} else {
 									Console.WriteLine(
-										$"\nUnexpected token {program[i].Value.ToString()} of type {program[i].Type}"+
+										$"\nUnexpected token {InsertVarible(program[i])} of type {program[i].Type}"+
 										$",expected token Type of type KeyWord"
 									);
+									return;
 								}
 							} else {
 								Console.WriteLine(
-									$"\n{program[i].Value.ToString()} is not valid varible name"
+									$"\n{InsertVarible(program[i])} is not valid varible name"
 								);
 								return;
+							}
+							if(!varibles.ContainsKey(name)){
+								varibles.Add(name, value);
+							} else {
+								Console.WriteLine(
+									$"\nVarible with name {name} already exist"
+								);
 							}
 							break;
 					}
 				}
 				else{
-					Console.WriteLine($"\nUnexpected token {token.Value.ToString()} of type {token.Type}, expected token of type Command");
+					Console.WriteLine($"\nUnexpected token {InsertVarible(token)} of type {token.Type}, expected token of type Command");
 					return;
 				}
+			}
+			} catch (ArgumentException e){
+				Console.WriteLine($"\nFollowing exception occured during runtime: \n{e.Message}");
+				return;
 			}
 		}
 		private enum TokenType{
@@ -129,6 +142,7 @@ namespace Steal{
 			string str = "";
 			bool insideQuotes = false;
 			bool escapeChar = false;
+			src = src.Replace("\r","");
 			for(int i = 0; i < src.Length; i++){
 				char sym = src[i];
 				if(!escapeChar){
@@ -146,6 +160,9 @@ namespace Steal{
 						case ' ':
 							if(insideQuotes) str+=sym;
 							else { result.Add(str); str=""; }
+							break;
+						case '@':
+							str += '\r';
 							break;
 						default:
 							str+=sym;
@@ -218,9 +235,35 @@ namespace Steal{
 		private bool ValidateVarName(string name){
 			if(int.TryParse(name[0].ToString(),out int _)) return false;
 			foreach(char letter in name){
-				if(!char.IsLower(letter)&&!char.IsUpper(letter)) return false;
+				if(!char.IsLower(letter)&&!char.IsUpper(letter)&&letter!='_') return false;
 			}
 			return true;
+		}
+		private string InsertVarible(Token token){
+			string[] words = token.Value.ToString().Split(' ');
+			for(int i = 0; i < words.Length; i++){
+				string word = words[i];
+				if(word[0] == '\r'){
+					string name = word.Substring(1);
+					if(ValidateVarName(name)){
+						if(varibles.ContainsKey(name)){
+							name = name.Remove(i);
+							name = name.Insert(i, varibles[name].ToString());
+						} else {
+							errMsg = $"Varible \"{name}\" doesn't exist";
+							throw new ArgumentException(errMsg);
+						}
+					} else {
+						errMsg = $"\"{name}\" is not valid varible name";
+						throw new ArgumentException(errMsg);
+					}
+				}
+			}
+			string result = "";
+			foreach(string word in words){
+				result += word+" ";
+			}
+			return result.Remove(result.Length-1);
 		}
 		public StealLang(string src){
 			this.src = src;
