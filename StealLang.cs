@@ -224,8 +224,8 @@ namespace Steal{
 						result.Add(new Token(TokenType.Keyword, src_p[i]));
 						break;
 					default:
-						if(long.TryParse(src_p[i], out long val_long)) result.Add(new Token(TokenType.Integer, val_long));
-						else if (double.TryParse(src_p[i], out double val_double)) result.Add(new Token(TokenType.Decimal, val_double));
+						if(long.TryParse(src_p[i],out long valL)) result.Add(new Token(TokenType.Integer, valL));
+						else if (double.TryParse(src_p[i],NumberStyles.Number,new CultureInfo("En-Us"),out double valD)) result.Add(new Token(TokenType.Decimal, valD));
 						else result.Add(new Token(TokenType.String, src_p[i]));
 						break;
 				}
@@ -241,14 +241,14 @@ namespace Steal{
 		}
 		private string InsertVarible(Token token){
 			List<string> words = new List<string>(token.Value.ToString().Split(' '));
-			for(int i = 0; i < words.Length; i++){
+			for(int i = 0; i < words.Count; i++){
 				string word = words[i];
 				if(word[0] == '\r'){
 					string name = word.Substring(1);
 					if(ValidateVarName(name)){
 						if(varibles.ContainsKey(name)){
-							words = words.Remove(i);
-							words = words.Insert(i, varibles[name].ToString());
+							words.Remove('\r'+name);
+							words.Insert(i, varibles[name].ToString());
 						} else {
 							errMsg = $"Varible \"{name}\" doesn't exist";
 							throw new ArgumentException(errMsg);
