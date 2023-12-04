@@ -161,7 +161,7 @@ namespace Steal{
 							if(insideQuotes) str+=sym;
 							else { result.Add(str); str=""; }
 							break;
-						case '@':
+						case '$':
 							str += '\r';
 							break;
 						default:
@@ -180,8 +180,8 @@ namespace Steal{
 						case '\\':
 							str+='\\';
 							break;
-						case '@':
-							str+='@';
+						case '$':
+							str+='$';
 							break;
 						case '"':
 							str+='"';
