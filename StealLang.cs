@@ -1,4 +1,4 @@
-//Written using VIM
+//Partialy written using VIM
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -31,12 +31,12 @@ namespace Steal{
 							break;
 						case Command.Var:
 							string name = "";
-							object type = null;
+							VarType type;
 							object value = null;
 							if(ValidateVarName(InsertVarible(program[++i]))){
 								name = InsertVarible(program[i]);
 								if(program[++i].Type == TokenType.Keyword && InsertVarible(program[i]) == "Type"){
-									if(!Enum.TryParse(typeof(VarType),InsertVarible(program[++i]),out type)){
+									if(!Enum.TryParse(InsertVarible(program[++i]),out type)){
 										Console.WriteLine(
 											$"\nUnexpexted token \"{InsertVarible(program[i])}\" "+
 											$"of type{program[i].Type}, expected token of type VaribleType"

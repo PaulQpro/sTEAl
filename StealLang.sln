@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33801.447
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StealLang", "StealLang.csproj", "{BE1EE479-CE36-42FB-A74C-5BB27CC91E05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StealShell", "StealShell.csproj", "{D425C805-D07C-441A-A6E5-C7077270DAC9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BE1EE479-CE36-42FB-A74C-5BB27CC91E05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE1EE479-CE36-42FB-A74C-5BB27CC91E05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE1EE479-CE36-42FB-A74C-5BB27CC91E05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE1EE479-CE36-42FB-A74C-5BB27CC91E05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D425C805-D07C-441A-A6E5-C7077270DAC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D425C805-D07C-441A-A6E5-C7077270DAC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D425C805-D07C-441A-A6E5-C7077270DAC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D425C805-D07C-441A-A6E5-C7077270DAC9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {27BEBDB5-D3DB-49B6-B4DF-0C6161594A3F}
+	EndGlobalSection
+EndGlobal
