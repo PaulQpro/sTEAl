@@ -549,7 +549,7 @@ namespace Steal{
 					}
 				}
 			} catch (ArgumentException e) {
-				Console.WriteLine($"\nFollowing interpreter exception occured during runtime: \n{e.Message}");
+				Console.WriteLine($"\nFollowing interpreter exception occured during runtime: \n{e.Message}\n{e.Data}");
 				return;
 			}
 		}
@@ -760,6 +760,7 @@ namespace Steal{
 		private string InsertVariable(Token token){//Inserts varable values into token's value. reference varable - $nameOfVariable
 			List<string> words = new List<string>(token.Value.ToString().Split(' '));
             while (words.Contains("")) words.Remove("");
+			if(words.Count == 0) { return token.Value.ToString(); }
 			for(int i = 0; i < words.Count; i++){
 				string word = words[i];
 				if(word[0] == '\r'){
