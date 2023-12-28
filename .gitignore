@@ -9,3 +9,5 @@
 /bin/Debug
 /App.config
 /.vs/StealLang/v16
+/bin/Release
+/obj/Release
