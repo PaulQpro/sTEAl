@@ -5,7 +5,7 @@ namespace Default{
 	public class Program{
 		public static void Main(){
 			Console.WriteLine(
-				"Welcome into Steal (Strictly Typed Entertaiment Algorithmic Language) v0.1 Shell\n" +
+				"Welcome into Steal (Strictly Typed Entertaiment Algorithmic Language) v0.2 Shell\n" +
 				"Enter file(realtive or absolute path) to execute"
 			);
 			string src;
@@ -31,7 +31,7 @@ namespace Default{
 				}
             }
 			new StealLang(src).Run();
-			Console.WriteLine("Done!\nPress any key to exit ...");
+			Console.WriteLine("Press any key to exit ...");
 			Console.ReadKey();
 		}
 	}
