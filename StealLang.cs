@@ -13,6 +13,8 @@ namespace Steal{
 		string errMsg;
 		Dictionary<string, object> varibles;
 		Dictionary<string, object> constants;
+		Token[] program;
+		long i;
 		public void Run() {//Main execution proccess
 			try {
 				varibles = new Dictionary<string, object>
@@ -20,12 +22,12 @@ namespace Steal{
 					{ "Result", 0L }
 				};
 				constants = new Dictionary<string, object>();
-				Token[] program = Tokenize(Parse());
+				program = Tokenize(Parse());
 				if (err) {
 					Console.WriteLine($"Following internal error ocurred during parsing: {errMsg}");
 					return;
 				}
-				for (int i = 0; i < program.Length; i++) {
+				for (i = 0; i < program.Length; i++) {
 					Token token = program[i];
 					if (token.Type == TokenType.Command) {
 						switch ((Command)Enum.Parse(typeof(Command), token.Value.ToString())) {
@@ -366,7 +368,7 @@ namespace Steal{
 									{
 										string op = program[i].Value.ToString();
 										object opRes = 0;
-										(object[] args, bool @float, bool err, string errMsg) res = GetOpArguments(ref i, program, 2);
+										(object[] args, bool @float, bool err, string errMsg) res = GetOpArguments(2);
 										if (res.err)
 										{
 											Console.WriteLine(
@@ -456,7 +458,7 @@ namespace Steal{
 										}
 										string op = program[i].Value.ToString();
 										object opRes = 0;
-										(object[] args, bool @float, bool err, string errMsg) res = GetOpArguments(ref i, program, num);
+										(object[] args, bool @float, bool err, string errMsg) res = GetOpArguments(num);
 										if (res.err)
 										{
 											Console.WriteLine(
@@ -602,46 +604,6 @@ namespace Steal{
 				Value = val;
 			}
 		}
-		private (object[] args, bool @float, bool err, string errMsg) GetOpArguments(ref int i, Token[] program, int num){
-			bool err;
-			string errMsg;
-			bool @float = false;
-			List<object> args = new List<object>();
-			if (program[++i].Type == TokenType.Integer) args.Add((long)program[i].Value);
-			else if (program[i].Type == TokenType.Decimal) { args.Add((decimal)program[i].Value); @float = true; }
-			else if (program[i].Value.ToString()[0] == '$' && long.TryParse(InsertVariable(program[i]), out long _i)) args.Add(_i);
-			else if (program[i].Value.ToString()[0] == '$' && decimal.TryParse(InsertVariable(program[i]), out decimal _d)) { args.Add(_d); @float = true; }
-			else
-            {
-				err = true;
-				errMsg = $"Unexpected token {program[i].Value} of type {program[i].Type}, expected token of type Integer or Decimal";
-				return (args.ToArray(), @float, err, errMsg);
-            }
-			for(int j = 1; j < num; j++)
-            {
-                if (@float)
-                {
-					if (decimal.TryParse(program[++i].Value.ToString(), out decimal _d)) args.Add(_d);
-                    else
-                    {
-						err = true;
-						errMsg = $"Unexpected token {program[i].Value} of type {program[i].Type}, expected token of type Integer or Decimal";
-						return (args.ToArray(), @float, err, errMsg);
-					}
-                }
-                else
-                {
-					if (long.TryParse(program[++i].Value.ToString(), out long _i)) args.Add(_i);
-					else
-                    {
-						err = true;
-						errMsg = $"Unexpected token {program[i].Value} of type {program[i].Type}, expected token of type Integer";
-						return (args.ToArray(), @float, err, errMsg);
-					}
-                }
-            }
-			return (args.ToArray(), @float, false, "");
-		}
 		private string[] Parse(){ //Parases source code into array of 'words' and 'sentences (multiple words)', also resolves escape-sequenses
 			line = 0;
 			List<string> result = new List<string>();
@@ -784,6 +746,46 @@ namespace Steal{
 				result += word+" ";
 			}
 			return result.Remove(result.Length-1);
+		}
+		private (object[] args, bool @float, bool err, string errMsg) GetOpArguments(int num){
+			bool err;
+			string errMsg;
+			bool @float = false;
+			List<object> args = new List<object>();
+			if (program[++i].Type == TokenType.Integer) args.Add((long)program[i].Value);
+			else if (program[i].Type == TokenType.Decimal) { args.Add((decimal)program[i].Value); @float = true; }
+			else if (program[i].Value.ToString()[0] == '$' && long.TryParse(InsertVariable(program[i]), out long _i)) args.Add(_i);
+			else if (program[i].Value.ToString()[0] == '$' && decimal.TryParse(InsertVariable(program[i]), out decimal _d)) { args.Add(_d); @float = true; }
+			else
+            {
+				err = true;
+				errMsg = $"Unexpected token {program[i].Value} of type {program[i].Type}, expected token of type Integer or Decimal";
+				return (args.ToArray(), @float, err, errMsg);
+            }
+			for(int j = 1; j < num; j++)
+            {
+                if (@float)
+                {
+					if (decimal.TryParse(program[++i].Value.ToString(), out decimal _d)) args.Add(_d);
+                    else
+                    {
+						err = true;
+						errMsg = $"Unexpected token {program[i].Value} of type {program[i].Type}, expected token of type Integer or Decimal";
+						return (args.ToArray(), @float, err, errMsg);
+					}
+                }
+                else
+                {
+					if (long.TryParse(program[++i].Value.ToString(), out long _i)) args.Add(_i);
+					else
+                    {
+						err = true;
+						errMsg = $"Unexpected token {program[i].Value} of type {program[i].Type}, expected token of type Integer";
+						return (args.ToArray(), @float, err, errMsg);
+					}
+                }
+            }
+			return (args.ToArray(), @float, false, "");
 		}
 		public StealLang(string src){
 			this.src = src;
