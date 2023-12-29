@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# IDE0220: Добавить явное приведение
+dotnet_diagnostic.IDE0220.severity = none
