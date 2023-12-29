@@ -27,529 +27,14 @@ namespace Steal{
 					Console.WriteLine($"Following internal error ocurred during parsing: {errMsg}");
 					return;
 				}
-				for (i = 0; i < program.Length; i++) {
-					Token token = program[i];
-					if (token.Type == TokenType.Command) {
-						switch ((Command)Enum.Parse(typeof(Command), token.Value.ToString())) {
-							case Command.Print: {
-									Console.Write(InsertVariable(program[++i]));
-									break;
-								}
-							case Command.Line: {
-									Console.WriteLine(InsertVariable(program[++i]));
-									break;
-								}
-							case Command.Var: {
-									string name = "";
-									VarType type;
-									object value = null;
-									if (ValidateVarName(program[++i].Value.ToString()))
-									{
-										name = program[i].Value.ToString();
-										if (program[++i].Type == TokenType.Keyword && program[i].Value.ToString().Replace('\r', '$') == "Type")
-										{
-											if (!Enum.TryParse(program[++i].Value.ToString().Replace('\r', '$'), out type))
-											{
-												Console.WriteLine(
-													$"\nUnexpexted token \"{program[i].Value.ToString().Replace('\r', '$')}\" " +
-													$"of type{program[i].Type}, expected token of type VarType"
-												);
-												return;
-											}
-											if (program[++i].Type == TokenType.Keyword && program[i].Value.ToString().Replace('\r', '$') == "Value")
-											{
-												switch (type)
-												{
-													case VarType.Integer:
-														if (program[++i].Type == TokenType.Integer)
-														{
-															value = program[i].Value;
-														}
-														else
-														{
-															Console.WriteLine(
-																$"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
-																$", expected token of type Integer"
-															);
-															return;
-														}
-														break;
-													case VarType.Decimal:
-														if (program[++i].Type == TokenType.Decimal || program[i].Type == TokenType.Integer)
-														{
-															value = program[i].Value;
-														}
-														else
-														{
-															Console.WriteLine(
-																$"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
-																$", expected token of type Decimal or Integer"
-															);
-															return;
-														}
-														break;
-													case VarType.String:
-														value = InsertVariable(program[++i]);
-														break;
-													case VarType.Logic:
-														if (program[++i].Type == TokenType.Logic)
-														{
-															value = program[i].Value;
-														}
-														else
-														{
-															Console.WriteLine(
-																$"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
-																$", expected token of type Logic"
-															);
-															return;
-														}
-														break;
-												}
-											}
-										}
-										else
-										{
-											Console.WriteLine(
-												$"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
-												$",expected token Type of type KeyWord"
-											);
-											return;
-										}
-									}
-									else
-									{
-										Console.WriteLine(
-											$"\n{program[i].Value.ToString().Replace('\r', '$')} is not valid name"
-										);
-										return;
-									}
-									if (!varibles.ContainsKey(name) || !constants.ContainsKey(name))
-									{
-										varibles.Add(name, value);
-									}
-									else
-									{
-										Console.WriteLine(
-											$"\nVarible with name {name} already exist"
-										);
-									}
-									break;
-								}
-							case Command.Const: {
-									string name = "";
-									VarType type;
-									object value = null;
-									if (ValidateVarName(program[++i].Value.ToString()))
-									{
-										name = program[i].Value.ToString();
-										if (program[++i].Type == TokenType.Keyword && program[i].Value.ToString().Replace('\r', '$') == "Type")
-										{
-											if (!Enum.TryParse(program[++i].Value.ToString().Replace('\r', '$'), out type))
-											{
-												Console.WriteLine(
-													$"\nUnexpexted token \"{program[i].Value.ToString().Replace('\r', '$')}\" " +
-													$"of type{program[i].Type}, expected token of type VarType"
-												);
-												return;
-											}
-											if (program[++i].Type == TokenType.Keyword && program[i].Value.ToString().Replace('\r', '$') == "Value")
-											{
-												switch (type)
-												{
-													case VarType.Integer:
-														if (program[++i].Type == TokenType.Integer)
-														{
-															value = program[i].Value;
-														}
-														else
-														{
-															Console.WriteLine(
-																$"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
-																$", expected token of type Integer"
-															);
-															return;
-														}
-														break;
-													case VarType.Decimal:
-														if (program[++i].Type == TokenType.Decimal || program[i].Type == TokenType.Integer)
-														{
-															value = program[i].Value;
-														}
-														else
-														{
-															Console.WriteLine(
-																$"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
-																$", expected token of type Decimal or Integer"
-															);
-															return;
-														}
-														break;
-													case VarType.String:
-														value = InsertVariable(program[++i]);
-														break;
-													case VarType.Logic:
-														if (program[++i].Type == TokenType.Logic)
-														{
-															value = program[i].Value;
-														}
-														else
-														{
-															Console.WriteLine(
-																$"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
-																$", expected token of type Logic"
-															);
-															return;
-														}
-														break;
-												}
-											}
-                                            else
-                                            {
-												Console.WriteLine(
-													$"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
-													$",expected token Value of type KeyWord"
-												);
-												return;
-											}
-										}
-										else
-										{
-											Console.WriteLine(
-												$"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
-												$",expected token Type of type KeyWord"
-											);
-											return;
-										}
-									}
-									else
-									{
-										Console.WriteLine(
-											$"\n{program[i].Value.ToString().Replace('\r', '$')} is not valid name"
-										);
-										return;
-									}
-									if (!varibles.ContainsKey(name) || !constants.ContainsKey(name))
-									{
-										constants.Add(name, value);
-									}
-									else
-									{
-										Console.WriteLine(
-											$"\nVarible with name {name} already exist"
-										);
-										return;
-									}
-									break;
-								}
-							case Command.Set: {
-									string name = "";
-									object value = null;
-									if (ValidateVarName(program[++i].Value.ToString()))
-									{
-										name = program[i].Value.ToString();
-										if (varibles.ContainsKey(name))
-										{
-											switch (varibles[name].GetType().FullName)
-											{
-												case "System.Int64":
-													if (program[++i].Type == TokenType.Integer)
-													{
-														value = program[i].Value;
-													}
-													else
-													{
-														Console.WriteLine(
-															$"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
-															$", expected token of type Integer"
-														);
-														return;
-													}
-													break;
-												case "System.Decimal":
-													if (program[++i].Type == TokenType.Decimal || program[i].Type == TokenType.Integer)
-													{
-														value = program[i].Value;
-													}
-													else
-													{
-														Console.WriteLine(
-															$"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
-															$", expected token of type Decimal or Integer"
-														);
-														return;
-													}
-													break;
-												case "System.String":
-													value = InsertVariable(program[++i]);
-													break;
-												case "System.Boolean":
-													if (program[++i].Type == TokenType.Logic)
-													{
-														value = program[i].Value;
-													}
-													else
-													{
-														Console.WriteLine(
-															$"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
-															$", expected token of type Logic"
-														);
-														return;
-													}
-													break;
-											}
-										}
-										else if (constants.ContainsKey(name))
-										{
-											Console.WriteLine(
-												$"\n{name} is a constant"
-											);
-											return;
-										}
-										else
-										{
-											Console.WriteLine(
-												$"\nVarible with name {name} does not exist"
-											);
-											return;
-										}
-									}
-									else
-									{
-										Console.WriteLine(
-											$"\n{program[i].Value.ToString().Replace('\r', '$')} is not valid name"
-										);
-										return;
-									}
-									break;
-								}
-							case Command.PgmDump: {
-									Console.WriteLine("Program Dump");
-									foreach (Token _token in program)
-									{
-										Console.WriteLine(JsonSerializer.Serialize(_token as object, new JsonSerializerOptions()
-										{
-											Converters =
-										{
-											new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
-										}
-										}));
-									}
-									break;
-								}
-							case Command.VarDump: {
-									Console.WriteLine("Variables Dump");
-									foreach (string _var in varibles.Keys)
-									{
-										string _type = "";
-										switch (varibles[_var].GetType().FullName)
-										{
-											case "System.Int64":
-												_type = "Integer";
-												break;
-											case "System.Decimal":
-												_type = "Decimal";
-												break;
-											case "System.String":
-												_type = "String";
-												break;
-										}
-										Console.WriteLine($"{{\"Name\":{_var},\"Type\":{ _type },\"Value\":{varibles[_var]}}}");
-									}
-									break;
-								}
-							case Command.SrcDump: {
-									Console.WriteLine("Source code Dump:");
-									Console.WriteLine(src);
-									break;
-							}
-							case Command.Comp: {
-									if (program[++i].Type == TokenType.MathOp)
-									{
-										string op = program[i].Value.ToString();
-										object opRes = 0;
-										(object[] args, bool @float, bool err, string errMsg) res = GetOpArguments(2);
-										if (res.err)
-										{
-											Console.WriteLine(
-												res.errMsg
-											);
-											return;
-										}
-										if (res.@float)
-										{
-											foreach (decimal arg in res.args)
-											{
-                                                switch (op)
-                                                {
-													case "Add":
-														opRes = decimal.Parse(opRes.ToString()) + arg;
-														break;
-													case "Sub":
-														opRes = decimal.Parse(opRes.ToString()) - arg;
-														break;
-													case "Mult":
-														opRes = decimal.Parse(opRes.ToString()) * arg;
-														break;
-													case "Div":
-														opRes = decimal.Parse(opRes.ToString()) * arg;
-														break;
-													case "Pow":
-														opRes = (decimal)Math.Pow(double.Parse(opRes.ToString()), (double)arg);
-														break;
-													case "Mod":
-														opRes = decimal.Parse(opRes.ToString()) % arg;
-														break;
-													default:
-														Console.WriteLine(
-															$"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
-															$", expected token of type MathOp"
-														);
-														return;
-												}
-											}
-										}
-										else
-										{
-											foreach (long arg in res.args)
-											{
-												switch (op)
-												{
-													case "Add":
-														opRes = long.Parse(opRes.ToString()) + arg;
-														break;
-													case "Sub":
-														opRes = long.Parse(opRes.ToString()) - arg;
-														break;
-													case "Mult":
-														opRes = long.Parse(opRes.ToString()) * arg;
-														break;
-													case "Div":
-														opRes = long.Parse(opRes.ToString()) * arg;
-														break;
-													case "Pow":
-														opRes = (long)Math.Pow(double.Parse(opRes.ToString()), (double)arg);
-														break;
-													case "Mod":
-														opRes = long.Parse(opRes.ToString()) % arg;
-														break;
-													default:
-														Console.WriteLine(
-															$"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
-															$", expected token of type MathOp"
-														);
-														return;
-												}
-											}
-										}
-										varibles.Remove("Result");
-										varibles.Add("Result", res.@float ? decimal.Parse(opRes.ToString()) : long.Parse(opRes.ToString()));
-									}
-									else if (program[i].Type == TokenType.Integer)
-									{
-										int num = int.Parse(program[i].Value.ToString());
-										if(program[++i].Type != TokenType.MathOp)
-                                        {
-											Console.WriteLine(
-												$"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
-												$", expected token of type MathOp"
-											);
-											return;
-										}
-										string op = program[i].Value.ToString();
-										object opRes = 0;
-										(object[] args, bool @float, bool err, string errMsg) res = GetOpArguments(num);
-										if (res.err)
-										{
-											Console.WriteLine(
-												res.errMsg
-											);
-											return;
-										}
-										if (res.@float)
-										{
-											foreach (decimal arg in res.args)
-											{
-												switch (op)
-												{
-													case "Add":
-														opRes = decimal.Parse(opRes.ToString()) + arg;
-														break;
-													case "Sub":
-														opRes = decimal.Parse(opRes.ToString()) - arg;
-														break;
-													case "Mult":
-														opRes = decimal.Parse(opRes.ToString()) * arg;
-														break;
-													case "Div":
-														opRes = decimal.Parse(opRes.ToString()) * arg;
-														break;
-													case "Pow":
-														opRes = (decimal)Math.Pow(double.Parse(opRes.ToString()), (double)arg);
-														break;
-													case "Mod":
-														opRes = decimal.Parse(opRes.ToString()) % arg;
-														break;
-													default:
-														Console.WriteLine(
-															$"\n{program[i].Value.ToString().Replace('\r', '$')} is not sequential math operation"
-														);
-														return;
-												}
-											}
-										}
-										else
-										{
-											foreach (long arg in res.args)
-											{
-												switch (op)
-												{
-													case "Add":
-														opRes = long.Parse(opRes.ToString()) + arg;
-														break;
-													case "Sub":
-														opRes = long.Parse(opRes.ToString()) - arg;
-														break;
-													case "Mult":
-														opRes = long.Parse(opRes.ToString()) * arg;
-														break;
-													case "Div":
-														opRes = long.Parse(opRes.ToString()) * arg;
-														break;
-													case "Pow":
-														opRes = (long)Math.Pow(double.Parse(opRes.ToString()), (double)arg);
-														break;
-													case "Mod":
-														opRes = long.Parse(opRes.ToString()) % arg;
-														break;
-													default:
-														Console.WriteLine(
-															$"\n{program[i].Value.ToString().Replace('\r', '$')} is not sequential math operation"
-														);
-														return;
-												}
-											}
-										}
-										varibles.Remove("Result");
-										varibles.Add("Result", res.@float ? decimal.Parse(opRes.ToString()) : long.Parse(opRes.ToString()));
-									}
-									else
-									{
-										Console.WriteLine(
-											$"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
-											$", expected token of type Integer or MathOp"
-										);
-										return;
-									}
-									break;
-								}
-						}
-					}
-					else {
-						Console.WriteLine($"\nUnexpected token {InsertVariable(token)} of type {token.Type}, expected token of type Command");
-						return;
-					}
-				}
+				for (i = 0; i < program.Length; i++)
+                {
+                    int code = ExecuteCommand();
+                    if(code != 0)
+                    {
+                        return;
+                    }
+                }
 			} catch (ArgumentException e) {
 				Console.WriteLine($"\nFollowing interpreter exception occured during runtime: \n{e.Message}\n{e.Data}");
 				return;
@@ -604,7 +89,784 @@ namespace Steal{
 				Value = val;
 			}
 		}
-		private string[] Parse(){ //Parases source code into array of 'words' and 'sentences (multiple words)', also resolves escape-sequenses
+		private int ExecuteCommand()
+        {
+            Token token = program[i];
+            if (token.Type == TokenType.Command)
+            {
+                switch ((Command)Enum.Parse(typeof(Command), token.Value.ToString()))
+                {
+                    case Command.Print:
+                        {
+                            Console.Write(InsertVariable(program[++i]));
+                            break;
+                        }
+                    case Command.Line:
+                        {
+                            Console.WriteLine(InsertVariable(program[++i]));
+                            break;
+                        }
+                    case Command.Var:
+                        {
+                            string name;
+                            object value = null;
+                            if (ValidateVarName(program[++i].Value.ToString()))
+                            {
+                                name = program[i].Value.ToString();
+                                if (program[++i].Type == TokenType.Keyword && program[i].Value.ToString().Replace('\r', '$') == "Type")
+                                {
+                                    if (!Enum.TryParse(program[++i].Value.ToString().Replace('\r', '$'), out VarType type))
+                                    {
+                                        Console.WriteLine(
+                                            $"\nUnexpexted token \"{program[i].Value.ToString().Replace('\r', '$')}\" " +
+                                            $"of type{program[i].Type}, expected token of type VarType"
+                                        );
+                                        return 1;
+                                    }
+                                    if (program[++i].Type == TokenType.Keyword && program[i].Value.ToString().Replace('\r', '$') == "Value")
+                                    {
+                                        switch (type)
+                                        {
+                                            case VarType.Integer:
+                                                {
+                                                    if (program[i].Type == TokenType.Integer)
+                                                    {
+                                                        value = long.Parse(program[i].Value.ToString());
+                                                    }
+                                                    else if (program[i].Value.ToString()[0] == '$')
+                                                    {
+                                                        string _name = program[i].Value.ToString().Substring(1);
+                                                        if (ValidateVarName(_name) && (varibles.ContainsKey(_name) || constants.ContainsKey(_name)))
+                                                        {
+                                                            string _value = InsertVariable(program[i]);
+                                                            if (long.TryParse(_value.Replace(',', '.'), NumberStyles.Integer, new CultureInfo("En-Us"), out long _i))
+                                                            {
+                                                                value = _i;
+                                                            }
+                                                            else
+                                                            {
+                                                                Console.WriteLine(
+                                                                    $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                                                    $", expected token of type Integer"
+                                                                );
+                                                                return 1;
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            Console.WriteLine(
+                                                                $"\n{program[i].Value.ToString().Replace('\r', '$')} is not valid name " +
+                                                                $"or variable with such name does not exists"
+                                                            );
+                                                            return 1;
+                                                        }
+                                                    }
+                                                    break;
+                                                }
+                                            case VarType.Decimal:
+                                                {
+                                                    if (program[++i].Type == TokenType.Decimal)
+                                                    {
+                                                        value = program[i].Value;
+                                                    }
+                                                    else if (program[i].Type == TokenType.Integer)
+                                                    {
+                                                        value = long.Parse(program[i].Value.ToString());
+                                                    }
+                                                    else if (program[i].Value.ToString()[0] == '$')
+                                                    {
+                                                        string _name = program[i].Value.ToString().Substring(1);
+                                                        if (ValidateVarName(_name) && (varibles.ContainsKey(_name) || constants.ContainsKey(_name)))
+                                                        {
+                                                            string _value = InsertVariable(program[i]);
+                                                            if (decimal.TryParse(_value.Replace(',', '.'), NumberStyles.Number, new CultureInfo("En-Us"), out decimal _d))
+                                                            {
+                                                                value = _d;
+                                                            }
+                                                            else if (long.TryParse(_value.Replace(',', '.'), NumberStyles.Integer, new CultureInfo("En-Us"), out long _i))
+                                                            {
+                                                                value = _i;
+                                                            }
+                                                            else
+                                                            {
+                                                                Console.WriteLine(
+                                                                    $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                                                    $", expected token of type Integer or Decimal"
+                                                                );
+                                                                return 1;
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            Console.WriteLine(
+                                                                $"\n{program[i].Value.ToString().Replace('\r', '$')} is not valid name " +
+                                                                $"or variable with such name does not exists"
+                                                            );
+                                                            return 1;
+                                                        }
+                                                    }
+                                                    break;
+                                                }
+                                            case VarType.String:
+                                                value = InsertVariable(program[++i]);
+                                                break;
+                                            case VarType.Logic:
+                                                if (program[++i].Type == TokenType.Logic)
+                                                {
+                                                    value = program[i].Value;
+                                                }
+                                                else if (program[i].Value.ToString()[0] == '$')
+                                                {
+                                                    string _name = program[i].Value.ToString().Substring(1);
+                                                    if (ValidateVarName(_name) && (varibles.ContainsKey(_name) || constants.ContainsKey(_name)))
+                                                    {
+                                                        string _value = InsertVariable(program[i]);
+                                                        if (_value == "True" || _value == "False")
+                                                        {
+                                                            value = _value;
+                                                        }
+                                                        else
+                                                        {
+                                                            Console.WriteLine(
+                                                                $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                                                $", expected token of type Logic"
+                                                            );
+                                                            return 1;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        Console.WriteLine(
+                                                            $"\n{program[i].Value.ToString().Replace('\r', '$')} is not valid name " +
+                                                            $"or variable with such name does not exists"
+                                                        );
+                                                        return 1;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    Console.WriteLine(
+                                                        $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                                        $", expected token of type Logic"
+                                                    );
+                                                    return 1;
+                                                }
+                                                break;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine(
+                                        $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                        $",expected token Type of type KeyWord"
+                                    );
+                                    return 1;
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine(
+                                    $"\n{program[i].Value.ToString().Replace('\r', '$')} is not valid name"
+                                );
+                                return 1;
+                            }
+                            if (!varibles.ContainsKey(name) || !constants.ContainsKey(name))
+                            {
+                                varibles.Add(name, value);
+                            }
+                            else
+                            {
+                                Console.WriteLine(
+                                    $"\nVarible with name {name} already exist"
+                                );
+								return 1;
+                            }
+                            break;
+                        }
+                    case Command.Const:
+                        {
+                            string name;
+                            object value = null;
+                            if (ValidateVarName(program[++i].Value.ToString()))
+                            {
+                                name = program[i].Value.ToString();
+                                if (program[++i].Type == TokenType.Keyword && program[i].Value.ToString().Replace('\r', '$') == "Type")
+                                {
+                                    if (!Enum.TryParse(program[++i].Value.ToString().Replace('\r', '$'), out VarType type))
+                                    {
+                                        Console.WriteLine(
+                                            $"\nUnexpexted token \"{program[i].Value.ToString().Replace('\r', '$')}\" " +
+                                            $"of type{program[i].Type}, expected token of type VarType"
+                                        );
+                                        return 1;
+                                    }
+                                    if (program[++i].Type == TokenType.Keyword && program[i].Value.ToString().Replace('\r', '$') == "Value")
+                                    {
+                                        switch (type)
+                                        {
+                                            case VarType.Integer:
+                                                {
+                                                    if (program[i].Type == TokenType.Integer)
+                                                    {
+                                                        value = long.Parse(program[i].Value.ToString());
+                                                    }
+                                                    else if (program[i].Value.ToString()[0] == '$')
+                                                    {
+                                                        string _name = program[i].Value.ToString().Substring(1);
+                                                        if (ValidateVarName(_name) && (varibles.ContainsKey(_name) || constants.ContainsKey(_name)))
+                                                        {
+                                                            string _value = InsertVariable(program[i]);
+                                                            if (long.TryParse(_value.Replace(',', '.'), NumberStyles.Integer, new CultureInfo("En-Us"), out long _i))
+                                                            {
+                                                                value = _i;
+                                                            }
+                                                            else
+                                                            {
+                                                                Console.WriteLine(
+                                                                    $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                                                    $", expected token of type Integer"
+                                                                );
+                                                                return 1;
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            Console.WriteLine(
+                                                                $"\n{program[i].Value.ToString().Replace('\r', '$')} is not valid name " +
+                                                                $"or variable with such name does not exists"
+                                                            );
+                                                            return 1;
+                                                        }
+                                                    }
+                                                    break;
+                                                }
+                                            case VarType.Decimal:
+                                                {
+                                                    if (program[++i].Type == TokenType.Decimal)
+                                                    {
+                                                        value = program[i].Value;
+                                                    }
+                                                    else if (program[i].Type == TokenType.Integer)
+                                                    {
+                                                        value = long.Parse(program[i].Value.ToString());
+                                                    }
+                                                    else if (program[i].Value.ToString()[0] == '$')
+                                                    {
+                                                        string _name = program[i].Value.ToString().Substring(1);
+                                                        if (ValidateVarName(_name) && (varibles.ContainsKey(_name) || constants.ContainsKey(_name)))
+                                                        {
+                                                            string _value = InsertVariable(program[i]);
+                                                            if (decimal.TryParse(_value.Replace(',', '.'), NumberStyles.Number, new CultureInfo("En-Us"), out decimal _d))
+                                                            {
+                                                                value = _d;
+                                                            }
+                                                            else if (long.TryParse(_value.Replace(',', '.'), NumberStyles.Integer, new CultureInfo("En-Us"), out long _i))
+                                                            {
+                                                                value = _i;
+                                                            }
+                                                            else
+                                                            {
+                                                                Console.WriteLine(
+                                                                    $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                                                    $", expected token of type Integer or Decimal"
+                                                                );
+                                                                return 1;
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            Console.WriteLine(
+                                                                $"\n{program[i].Value.ToString().Replace('\r', '$')} is not valid name " +
+                                                                $"or variable with such name does not exists"
+                                                            );
+                                                            return 1;
+                                                        }
+                                                    }
+                                                    break;
+                                                }
+                                            case VarType.String:
+                                                value = InsertVariable(program[++i]);
+                                                break;
+                                            case VarType.Logic:
+                                                if (program[++i].Type == TokenType.Logic)
+                                                {
+                                                    value = program[i].Value;
+                                                }
+                                                else if (program[i].Value.ToString()[0] == '$')
+                                                {
+                                                    string _name = program[i].Value.ToString().Substring(1);
+                                                    if (ValidateVarName(_name) && (varibles.ContainsKey(_name) || constants.ContainsKey(_name)))
+                                                    {
+                                                        string _value = InsertVariable(program[i]);
+                                                        if (_value == "True" || _value == "False")
+                                                        {
+                                                            value = _value;
+                                                        }
+                                                        else
+                                                        {
+                                                            Console.WriteLine(
+                                                                $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                                                $", expected token of type Logic"
+                                                            );
+                                                            return 1;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        Console.WriteLine(
+                                                            $"\n{program[i].Value.ToString().Replace('\r', '$')} is not valid name " +
+                                                            $"or variable with such name does not exists"
+                                                        );
+                                                        return 1;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    Console.WriteLine(
+                                                        $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                                        $", expected token of type Logic"
+                                                    );
+                                                    return 1;
+                                                }
+                                                break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine(
+                                            $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                            $",expected token Value of type KeyWord"
+                                        );
+                                        return 1;
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine(
+                                        $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                        $",expected token Type of type KeyWord"
+                                    );
+                                    return 1;
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine(
+                                    $"\n{program[i].Value.ToString().Replace('\r', '$')} is not valid name"
+                                );
+                                return 1;
+                            }
+                            if (!varibles.ContainsKey(name) || !constants.ContainsKey(name))
+                            {
+                                constants.Add(name, value);
+                            }
+                            else
+                            {
+                                Console.WriteLine(
+                                    $"\nVarible with name {name} already exist"
+                                );
+                                return 1;
+                            }
+                            break;
+                        }
+                    case Command.Set:
+                        {
+                            string name;
+                            object value = null;
+                            if (ValidateVarName(program[++i].Value.ToString()))
+                            {
+                                name = program[i].Value.ToString();
+                                if (varibles.ContainsKey(name))
+                                {
+                                    switch (varibles[name].GetType().FullName)
+                                    {
+                                        case "System.Int64":
+                                            {
+                                                if (program[i].Type == TokenType.Integer)
+                                                {
+                                                    value = long.Parse(program[i].Value.ToString());
+                                                }
+                                                else if (program[i].Value.ToString()[0] == '$')
+                                                {
+                                                    string _name = program[i].Value.ToString().Substring(1);
+                                                    if (ValidateVarName(_name) && (varibles.ContainsKey(_name) || constants.ContainsKey(_name)))
+                                                    {
+                                                        string _value = InsertVariable(program[i]);
+                                                        if (long.TryParse(_value.Replace(',', '.'), NumberStyles.Integer, new CultureInfo("En-Us"), out long _i))
+                                                        {
+                                                            value = _i;
+                                                        }
+                                                        else
+                                                        {
+                                                            Console.WriteLine(
+                                                                $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                                                $", expected token of type Integer"
+                                                            );
+                                                            return 1;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        Console.WriteLine(
+                                                            $"\n{program[i].Value.ToString().Replace('\r', '$')} is not valid name " +
+                                                            $"or variable with such name does not exists"
+                                                        );
+                                                        return 1;
+                                                    }
+                                                }
+                                                break;
+                                            }
+                                        case "System.Decimal":
+                                            {
+                                                if (program[++i].Type == TokenType.Decimal)
+                                                {
+                                                    value = program[i].Value;
+                                                }
+                                                else if (program[i].Type == TokenType.Integer)
+                                                {
+                                                    value = long.Parse(program[i].Value.ToString());
+                                                }
+                                                else if (program[i].Value.ToString()[0] == '$')
+                                                {
+                                                    string _name = program[i].Value.ToString().Substring(1);
+                                                    if (ValidateVarName(_name) && (varibles.ContainsKey(_name) || constants.ContainsKey(_name)))
+                                                    {
+                                                        string _value = InsertVariable(program[i]);
+                                                        if (decimal.TryParse(_value.Replace(',', '.'), NumberStyles.Number, new CultureInfo("En-Us"), out decimal _d))
+                                                        {
+                                                            value = _d;
+                                                        }
+                                                        else if (long.TryParse(_value.Replace(',', '.'), NumberStyles.Integer, new CultureInfo("En-Us"), out long _i))
+                                                        {
+                                                            value = _i;
+                                                        }
+                                                        else
+                                                        {
+                                                            Console.WriteLine(
+                                                                $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                                                $", expected token of type Integer or Decimal"
+                                                            );
+                                                            return 1;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        Console.WriteLine(
+                                                            $"\n{program[i].Value.ToString().Replace('\r', '$')} is not valid name " +
+                                                            $"or variable with such name does not exists"
+                                                        );
+                                                        return 1;
+                                                    }
+                                                }
+                                                break;
+                                            }
+                                        case "System.String":
+                                            value = InsertVariable(program[++i]);
+                                            break;
+                                        case "System.Boolean":
+                                            if (program[++i].Type == TokenType.Logic)
+                                            {
+                                                value = program[i].Value;
+                                            }
+                                            else if (program[i].Value.ToString()[0] == '$')
+                                            {
+                                                string _name = program[i].Value.ToString().Substring(1);
+                                                if (ValidateVarName(_name) && (varibles.ContainsKey(_name) || constants.ContainsKey(_name)))
+                                                {
+                                                    string _value = InsertVariable(program[i]);
+                                                    if (_value == "True" || _value == "False")
+                                                    {
+                                                        value = _value;
+                                                    }
+                                                    else
+                                                    {
+                                                        Console.WriteLine(
+                                                            $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                                            $", expected token of type Logic"
+                                                        );
+                                                        return 1;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    Console.WriteLine(
+                                                        $"\n{program[i].Value.ToString().Replace('\r', '$')} is not valid name " +
+                                                        $"or variable with such name does not exists"
+                                                    );
+                                                    return 1;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine(
+                                                    $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                                    $", expected token of type Logic"
+                                                );
+                                                return 1;
+                                            }
+                                            break;
+                                    }
+									varibles[name] = value;
+                                }
+                                else if (constants.ContainsKey(name))
+                                {
+                                    Console.WriteLine(
+                                        $"\n{name} is a constant"
+                                    );
+                                    return 1;
+                                }
+                                else
+                                {
+                                    Console.WriteLine(
+                                        $"\nVarible with name {name} does not exist"
+                                    );
+                                    return 1;
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine(
+                                    $"\n{program[i].Value.ToString().Replace('\r', '$')} is not valid name"
+                                );
+                                return 1;
+                            }
+                            break;
+                        }
+                    case Command.PgmDump:
+                        {
+                            Console.WriteLine("Program Dump");
+                            foreach (Token _token in program)
+                            {
+                                Console.WriteLine(JsonSerializer.Serialize(_token as object, new JsonSerializerOptions()
+                                {
+                                    Converters =
+                                        {
+                                            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+                                        }
+                                }));
+                            }
+                            break;
+                        }
+                    case Command.VarDump:
+                        {
+                            Console.WriteLine("Variables Dump");
+                            foreach (string _var in varibles.Keys)
+                            {
+                                string _type = "";
+                                switch (varibles[_var].GetType().FullName)
+                                {
+                                    case "System.Int64":
+                                        _type = "Integer";
+                                        break;
+                                    case "System.Decimal":
+                                        _type = "Decimal";
+                                        break;
+                                    case "System.String":
+                                        _type = "String";
+                                        break;
+                                }
+                                Console.WriteLine($"{{\"Name\":{_var},\"Type\":{_type},\"Value\":{varibles[_var]}}}");
+                            }
+                            break;
+                        }
+                    case Command.SrcDump:
+                        {
+                            Console.WriteLine("Source code Dump:");
+                            Console.WriteLine(src);
+                            break;
+                        }
+                    case Command.Comp:
+                        {
+                            if (program[++i].Type == TokenType.MathOp)
+                            {
+                                string op = program[i].Value.ToString();
+                                object opRes = 0;
+                                (object[] args, bool @float, bool err, string errMsg) res = GetOpArguments(2);
+                                if (res.err)
+                                {
+                                    Console.WriteLine(
+                                        res.errMsg
+                                    );
+                                    return 1;
+                                }
+                                if (res.@float)
+                                {
+                                    foreach (decimal arg in res.args)
+                                    {
+                                        switch (op)
+                                        {
+                                            case "Add":
+                                                opRes = decimal.Parse(opRes.ToString()) + arg;
+                                                break;
+                                            case "Sub":
+                                                opRes = decimal.Parse(opRes.ToString()) - arg;
+                                                break;
+                                            case "Mult":
+                                                opRes = decimal.Parse(opRes.ToString()) * arg;
+                                                break;
+                                            case "Div":
+                                                opRes = decimal.Parse(opRes.ToString()) * arg;
+                                                break;
+                                            case "Pow":
+                                                opRes = (decimal)Math.Pow(double.Parse(opRes.ToString()), (double)arg);
+                                                break;
+                                            case "Mod":
+                                                opRes = decimal.Parse(opRes.ToString()) % arg;
+                                                break;
+                                            default:
+                                                Console.WriteLine(
+                                                    $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                                    $", expected token of type MathOp"
+                                                );
+                                                return 1;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (long arg in res.args)
+                                    {
+                                        switch (op)
+                                        {
+                                            case "Add":
+                                                opRes = long.Parse(opRes.ToString()) + arg;
+                                                break;
+                                            case "Sub":
+                                                opRes = long.Parse(opRes.ToString()) - arg;
+                                                break;
+                                            case "Mult":
+                                                opRes = long.Parse(opRes.ToString()) * arg;
+                                                break;
+                                            case "Div":
+                                                opRes = long.Parse(opRes.ToString()) * arg;
+                                                break;
+                                            case "Pow":
+                                                opRes = (long)Math.Pow(double.Parse(opRes.ToString()), (double)arg);
+                                                break;
+                                            case "Mod":
+                                                opRes = long.Parse(opRes.ToString()) % arg;
+                                                break;
+                                            default:
+                                                Console.WriteLine(
+                                                    $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                                    $", expected token of type MathOp"
+                                                );
+                                                return 1;
+                                        }
+                                    }
+                                }
+                                varibles.Remove("Result");
+                                varibles.Add("Result", res.@float ? decimal.Parse(opRes.ToString()) : long.Parse(opRes.ToString()));
+                            }
+                            else if (program[i].Type == TokenType.Integer)
+                            {
+                                int num = int.Parse(program[i].Value.ToString());
+                                if (program[++i].Type != TokenType.MathOp)
+                                {
+                                    Console.WriteLine(
+                                        $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                        $", expected token of type MathOp"
+                                    );
+                                    return 1;
+                                }
+                                string op = program[i].Value.ToString();
+                                object opRes = 0;
+                                (object[] args, bool @float, bool err, string errMsg) res = GetOpArguments(num);
+                                if (res.err)
+                                {
+                                    Console.WriteLine(
+                                        res.errMsg
+                                    );
+                                    return 1;
+                                }
+                                if (res.@float)
+                                {
+                                    foreach (decimal arg in res.args)
+                                    {
+                                        switch (op)
+                                        {
+                                            case "Add":
+                                                opRes = decimal.Parse(opRes.ToString()) + arg;
+                                                break;
+                                            case "Sub":
+                                                opRes = decimal.Parse(opRes.ToString()) - arg;
+                                                break;
+                                            case "Mult":
+                                                opRes = decimal.Parse(opRes.ToString()) * arg;
+                                                break;
+                                            case "Div":
+                                                opRes = decimal.Parse(opRes.ToString()) * arg;
+                                                break;
+                                            case "Pow":
+                                                opRes = (decimal)Math.Pow(double.Parse(opRes.ToString()), (double)arg);
+                                                break;
+                                            case "Mod":
+                                                opRes = decimal.Parse(opRes.ToString()) % arg;
+                                                break;
+                                            default:
+                                                Console.WriteLine(
+                                                    $"\n{program[i].Value.ToString().Replace('\r', '$')} is not sequential math operation"
+                                                );
+                                                return 1;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (long arg in res.args)
+                                    {
+                                        switch (op)
+                                        {
+                                            case "Add":
+                                                opRes = long.Parse(opRes.ToString()) + arg;
+                                                break;
+                                            case "Sub":
+                                                opRes = long.Parse(opRes.ToString()) - arg;
+                                                break;
+                                            case "Mult":
+                                                opRes = long.Parse(opRes.ToString()) * arg;
+                                                break;
+                                            case "Div":
+                                                opRes = long.Parse(opRes.ToString()) * arg;
+                                                break;
+                                            case "Pow":
+                                                opRes = (long)Math.Pow(double.Parse(opRes.ToString()), (double)arg);
+                                                break;
+                                            case "Mod":
+                                                opRes = long.Parse(opRes.ToString()) % arg;
+                                                break;
+                                            default:
+                                                Console.WriteLine(
+                                                    $"\n{program[i].Value.ToString().Replace('\r', '$')} is not sequential math operation"
+                                                );
+                                                return 1;
+                                        }
+                                    }
+                                }
+                                varibles.Remove("Result");
+                                varibles.Add("Result", res.@float ? decimal.Parse(opRes.ToString()) : long.Parse(opRes.ToString()));
+                            }
+                            else
+                            {
+                                Console.WriteLine(
+                                    $"\nUnexpected token {program[i].Value.ToString().Replace('\r', '$')} of type {program[i].Type}" +
+                                    $", expected token of type Integer or MathOp"
+                                );
+                                return 1;
+                            }
+                            break;
+                        }
+                }
+            }
+            else
+            {
+                Console.WriteLine($"\nUnexpected token {InsertVariable(token)} of type {token.Type}, expected token of type Command");
+                return 1;
+            }
+			return 0;
+        }
+        private string[] Parse(){ //Parases source code into array of 'words' and 'sentences (multiple words)', also resolves escape-sequenses
 			line = 0;
 			List<string> result = new List<string>();
 			string str = "";
